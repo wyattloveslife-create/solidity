@@ -12,6 +12,7 @@ Compiler Features:
 * Yul EVM Code Transform: Improve stack shuffler performance by fixing a BFS deduplication issue.
 
 Bugfixes:
+* Yul IR Code Generation: Encode custom error named parameters in declaration order instead of call-site order.
 
 
 ### 0.8.34 (2026-02-18)
