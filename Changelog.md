@@ -5,7 +5,7 @@ Language Features:
 Compiler Features:
 
 Bugfixes:
-
+* Code Generator: Remove custom error arguments of `require` when option `revert-strings=strip` is selected in the legacy pipeline.
 
 ### 0.8.34 (2026-02-18)
 
