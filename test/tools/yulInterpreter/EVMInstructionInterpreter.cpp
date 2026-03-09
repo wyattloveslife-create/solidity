@@ -657,10 +657,7 @@ bool EVMInstructionInterpreter::accessMemory(u256 const& _offset, u256 const& _s
 bytes EVMInstructionInterpreter::readMemory(u256 const& _offset, u256 const& _size)
 {
 	yulAssert(_size <= s_maxRangeSize, "Too large read.");
-	bytes data(size_t(_size), uint8_t(0));
-	for (size_t i = 0; i < data.size(); ++i)
-		data[i] = m_state.memory[_offset + i];
-	return data;
+	return m_state.readMemory(_offset, _size);
 }
 
 u256 EVMInstructionInterpreter::readMemoryWord(u256 const& _offset)
