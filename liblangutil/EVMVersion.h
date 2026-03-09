@@ -22,12 +22,12 @@
 #pragma once
 
 #include <libsolutil/Assertions.h>
+#include <liblangutil//Exceptions.h>
 
 #include <array>
 #include <cstdint>
 #include <optional>
 #include <string>
-
 
 namespace solidity::evmasm
 {
@@ -63,6 +63,7 @@ public:
 	static EVMVersion constexpr cancun() { return {Version::Cancun}; }
 	static EVMVersion constexpr prague() { return {Version::Prague}; }
 	static EVMVersion constexpr osaka() { return {Version::Osaka}; }
+	static EVMVersion constexpr future() { return {Version::Future}; }
 
 	static auto constexpr allVersions() {
 		return std::array{
@@ -80,6 +81,7 @@ public:
 			cancun(),
 			prague(),
 			osaka(),
+			future(),
 		};
 	}
 
@@ -102,6 +104,7 @@ public:
 	static EVMVersion firstWithEOF() { return {Version::Osaka}; }
 
 	bool isExperimental() const {
+		solAssert(Version::Future > currentVersion);
 		return m_version > currentVersion;
 	}
 
@@ -125,6 +128,7 @@ public:
 		case Version::Cancun: return "cancun";
 		case Version::Prague: return "prague";
 		case Version::Osaka: return "osaka";
+		case Version::Future: return "@future";
 		}
 		util::unreachable();
 	}
@@ -169,6 +173,7 @@ private:
 		Cancun,
 		Prague,
 		Osaka,
+		Future,
 	};
 	static auto constexpr currentVersion = Version::Osaka;
 
