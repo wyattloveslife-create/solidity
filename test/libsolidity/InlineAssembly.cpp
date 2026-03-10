@@ -56,7 +56,7 @@ std::optional<Error> parseAndReturnFirstError(
 	std::string const& _source,
 	bool _assemble = false,
 	bool _allowWarnings = true,
-	YulStack::Language _language = YulStack::Language::Assembly,
+	YulStack::Language _language = YulStack::Language::StrictAssembly,
 	YulStack::Machine _machine = YulStack::Machine::EVM
 )
 {
@@ -93,14 +93,14 @@ bool successParse(
 	std::string const& _source,
 	bool _assemble = false,
 	bool _allowWarnings = true,
-	YulStack::Language _language = YulStack::Language::Assembly,
+	YulStack::Language _language = YulStack::Language::StrictAssembly,
 	YulStack::Machine _machine = YulStack::Machine::EVM
 )
 {
 	return !parseAndReturnFirstError(_source, _assemble, _allowWarnings, _language, _machine);
 }
 
-bool successAssemble(std::string const& _source, bool _allowWarnings = true, YulStack::Language _language = YulStack::Language::Assembly)
+bool successAssemble(std::string const& _source, bool _allowWarnings = true, YulStack::Language _language = YulStack::Language::StrictAssembly)
 {
 	return
 		successParse(_source, true, _allowWarnings, _language, YulStack::Machine::EVM);
@@ -110,7 +110,7 @@ Error expectError(
 	std::string const& _source,
 	bool _assemble,
 	bool _allowWarnings = false,
-	YulStack::Language _language = YulStack::Language::Assembly
+	YulStack::Language _language = YulStack::Language::StrictAssembly
 )
 {
 
@@ -124,7 +124,7 @@ void parsePrintCompare(std::string const& _source, bool _canWarn = false)
 	YulStack stack(
 		solidity::test::CommonOptions::get().evmVersion(),
 		solidity::test::CommonOptions::get().eofVersion(),
-		YulStack::Language::Assembly,
+		YulStack::Language::StrictAssembly,
 		OptimiserSettings::none(),
 		DebugInfoSelection::None()
 	);
@@ -148,7 +148,7 @@ do \
 } while(0)
 
 #define CHECK_ERROR(text, assemble, typ, substring, warnings) \
-CHECK_ERROR_LANG(text, assemble, typ, substring, warnings, YulStack::Language::Assembly)
+CHECK_ERROR_LANG(text, assemble, typ, substring, warnings, YulStack::Language::StrictAssembly)
 
 #define CHECK_PARSE_ERROR(text, type, substring) \
 CHECK_ERROR(text, false, type, substring, false)
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(print_string_literal_unicode)
 	YulStack stack(
 		solidity::test::CommonOptions::get().evmVersion(),
 		solidity::test::CommonOptions::get().eofVersion(),
-		YulStack::Language::Assembly,
+		YulStack::Language::StrictAssembly,
 		OptimiserSettings::none(),
 		DebugInfoSelection::None()
 	);

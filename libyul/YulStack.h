@@ -81,7 +81,7 @@ public:
 		YulStack(
 			langutil::EVMVersion{},
 			std::nullopt,
-			Language::Assembly,
+			Language::StrictAssembly,
 			solidity::frontend::OptimiserSettings::none(),
 			langutil::DebugInfoSelection::Default()
 		)
@@ -174,7 +174,7 @@ private:
 
 	void reportUnimplementedFeatureError(langutil::UnimplementedFeatureError const& _error);
 
-	Language m_language = Language::Assembly;
+	Language m_language = Language::StrictAssembly;
 	langutil::EVMVersion m_evmVersion;
 	std::optional<uint8_t> m_eofVersion;
 	solidity::frontend::OptimiserSettings m_optimiserSettings;

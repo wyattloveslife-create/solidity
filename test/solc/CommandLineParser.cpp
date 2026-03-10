@@ -276,9 +276,9 @@ BOOST_AUTO_TEST_CASE(assembly_mode_options)
 	static std::vector<std::tuple<std::vector<std::string>, YulStack::Machine, YulStack::Language>> const allowedCombinations = {
 		{{"--machine=evm", "--yul-dialect=evm", "--assemble"}, YulStack::Machine::EVM, YulStack::Language::StrictAssembly},
 		{{"--machine=evm", "--yul-dialect=evm", "--strict-assembly"}, YulStack::Machine::EVM, YulStack::Language::StrictAssembly},
-		{{"--machine=evm", "--assemble"}, YulStack::Machine::EVM, YulStack::Language::Assembly},
+		{{"--machine=evm", "--assemble"}, YulStack::Machine::EVM, YulStack::Language::StrictAssembly},
 		{{"--machine=evm", "--strict-assembly"}, YulStack::Machine::EVM, YulStack::Language::StrictAssembly},
-		{{"--assemble"}, YulStack::Machine::EVM, YulStack::Language::Assembly},
+		{{"--assemble"}, YulStack::Machine::EVM, YulStack::Language::StrictAssembly},
 		{{"--strict-assembly"}, YulStack::Machine::EVM, YulStack::Language::StrictAssembly},
 	};
 

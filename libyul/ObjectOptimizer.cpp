@@ -47,7 +47,6 @@ Dialect const& yul::languageToDialect(Language _language, EVMVersion _version, s
 {
 	switch (_language)
 	{
-	case Language::Assembly:
 	case Language::StrictAssembly:
 		return EVMDialect::strictAssemblyForEVMObjects(_version, _eofVersion);
 	}

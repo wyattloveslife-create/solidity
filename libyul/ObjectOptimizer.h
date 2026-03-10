@@ -34,8 +34,7 @@ namespace solidity::yul
 
 enum class Language
 {
-	Assembly,
-	StrictAssembly,
+	StrictAssembly
 };
 
 Dialect const& languageToDialect(Language _language, langutil::EVMVersion _version, std::optional<uint8_t> _eofVersion);
