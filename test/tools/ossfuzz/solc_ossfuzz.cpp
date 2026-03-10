@@ -47,7 +47,8 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 		sourceCode = t.sources().sources;
 		const bool compileViaYul = _size % 3 == 1;
 		const bool optimize = _size % 2 == 0;
-		const solidity::langutil::EVMVersion evmVersion = s_evmVersions[_size % s_evmVersions.size()];
+		// Always use the latest EVM version. Bugs with older EVMs are not as relevant
+		const solidity::langutil::EVMVersion evmVersion = s_evmVersions.back();
 		const bool forceSMT = false;
 		FuzzerUtil::testCompiler(
 			sourceCode,
