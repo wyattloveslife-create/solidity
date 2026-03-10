@@ -14,7 +14,6 @@ string(APPEND CUSTOM_COMP_FLAGS " -I /usr/local/include/c++/v1")
 string(APPEND CUSTOM_COMP_FLAGS " -fsanitize=undefined")
 string(APPEND CUSTOM_COMP_FLAGS " -fsanitize=fuzzer-no-link")
 string(APPEND CUSTOM_COMP_FLAGS " -fuse-ld=gold")
-string(APPEND CUSTOM_COMP_FLAGS " -fno-omit-frame-pointer")
 string(APPEND CUSTOM_COMP_FLAGS " -stdlib=libc++")
 set(CMAKE_CXX_FLAGS "${CUSTOM_COMP_FLAGS}" CACHE STRING "Custom compilation flags" FORCE)
 # Link statically against boost libraries
