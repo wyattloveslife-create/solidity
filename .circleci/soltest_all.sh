@@ -41,8 +41,14 @@ DEFAULT_EVM_VALUES=(
     shanghai
     cancun
     osaka
+    @future
 )
 EVMS_WITH_EOF=(osaka)
+
+# Make sure to add any new EVM version that is > DEFAULT_EVM
+# Also make sure to remove it once that version becomes DEFAULT_EVM
+# Do not remove @future
+EXPERIMENTAL_EVM_VERSIONS=(@future)
 
 # Deserialize the EVM_VALUES array if it was provided as argument or
 # set EVM_VALUES to the default values.
@@ -73,12 +79,19 @@ do
                 continue
             fi
 
+            if [[ " ${EXPERIMENTAL_EVM_VERSIONS[*]} " == *" $EVM "* ]]; then
+                EXPERIMENTAL="--experimental"
+            else
+                EXPERIMENTAL=""
+            fi
+
             ENFORCE_GAS_ARGS=""
             [ "${EVM}" = "${DEFAULT_EVM}" ] && ENFORCE_GAS_ARGS="--enforce-gas-cost"
             # Run SMTChecker tests only when OPTIMIZE == 0
             DISABLE_SMTCHECKER=""
             [ "${OPTIMIZE}" != "0" ] && DISABLE_SMTCHECKER="-t !smtCheckerTests"
 
+            EXPERIMENTAL="$EXPERIMENTAL" \
             EVM="$EVM" \
             EOF_VERSION="$EOF_VERSION" \
             OPTIMIZE="$OPTIMIZE" \

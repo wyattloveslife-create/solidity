@@ -36,6 +36,7 @@ set -e
 
 OPTIMIZE=${OPTIMIZE:-"0"}
 EVM=${EVM:-"invalid"}
+EXPERIMENTAL=${EXPERIMENTAL:-""}
 EOF_VERSION=${EOF_VERSION:-0}
 CPUs=${CPUs:-3}
 REPODIR="$(realpath "$(dirname "$0")/..")"
