@@ -9,6 +9,7 @@ set(LIB_FUZZING_ENGINE "-fsanitize=fuzzer" CACHE STRING "Use libfuzzer back-end"
 add_compile_definitions(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 set(CUSTOM_COMP_FLAGS "")
 string(APPEND CUSTOM_COMP_FLAGS " -O1")
+string(APPEND CUSTOM_COMP_FLAGS " -fno-omit-frame-pointer")
 string(APPEND CUSTOM_COMP_FLAGS " -gline-tables-only")
 string(APPEND CUSTOM_COMP_FLAGS " -I /usr/local/include/c++/v1")
 string(APPEND CUSTOM_COMP_FLAGS " -fsanitize=undefined")
