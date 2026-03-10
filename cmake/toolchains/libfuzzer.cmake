@@ -6,7 +6,17 @@ set(OSSFUZZ ON CACHE BOOL "Enable fuzzer build" FORCE)
 set(LIB_FUZZING_ENGINE "-fsanitize=fuzzer" CACHE STRING "Use libfuzzer back-end" FORCE)
 # clang/libfuzzer specific flags for UBSan instrumentation
 # uses the more memory-efficient gold, which allows us to stay with the "large" resource class without OOM errors
-set(CMAKE_CXX_FLAGS "-O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -I /usr/local/include/c++/v1 -fsanitize=undefined -fsanitize=fuzzer-no-link -fuse-ld=gold -stdlib=libc++" CACHE STRING "Custom compilation flags" FORCE)
+add_compile_definitions(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+set(CUSTOM_COMP_FLAGS "")
+string(APPEND CUSTOM_COMP_FLAGS " -O1")
+string(APPEND CUSTOM_COMP_FLAGS " -glines-tables-only")
+string(APPEND CUSTOM_COMP_FLAGS " -I /usr/local/include/c++/v1")
+string(APPEND CUSTOM_COMP_FLAGS " -fsanitize=undefined")
+string(APPEND CUSTOM_COMP_FLAGS " -fsanitize=fuzzer-no-link")
+string(APPEND CUSTOM_COMP_FLAGS " -fuse-ld=gold")
+string(APPEND CUSTOM_COMP_FLAGS " -fno-omit-frame-pointer")
+string(APPEND CUSTOM_COMP_FLAGS " -stdlib=libc++")
+set(CMAKE_CXX_FLAGS CUSTOM_COMP_FLAGS CACHE STRING "Custom compilation flags" FORCE)
 # Link statically against boost libraries
 set(BOOST_FOUND ON CACHE BOOL "" FORCE)
 set(Boost_USE_STATIC_LIBS ON CACHE BOOL "Link against static Boost libraries" FORCE)
