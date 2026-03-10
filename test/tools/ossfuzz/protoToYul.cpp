@@ -254,19 +254,13 @@ void ProtoConverter::visit(Expression const& _x)
 		visit(_x.lowcall());
 		break;
 	case Expression::kCreate:
-		// Create and create2 return address of created contract which
-		// may lead to state change via sstore of the returned address.
-		if (!m_filterStatefulInstructions)
+		if (!m_filterOptimizationNoise)
 			visit(_x.create());
 		else
 			m_output << dictionaryToken();
 		break;
 	case Expression::kUnopdata:
-		// Filter datasize and dataoffset because these instructions may return
-		// a value that is a function of optimisation. Therefore, when run on
-		// an EVM client, the execution traces for unoptimised vs optimised
-		// programs may differ. This ends up as a false-positive bug report.
-		if (m_isObject && !m_filterStatefulInstructions)
+		if (m_isObject && !m_filterOptimizationNoise)
 			visit(_x.unopdata());
 		else
 			m_output << dictionaryToken();
@@ -611,10 +605,7 @@ void ProtoConverter::visit(UnaryOp const& _x)
 		return;
 	}
 
-	// The following instructions may lead to change of EVM state and are hence
-	// excluded to avoid false positives.
-	if (
-		m_filterStatefulInstructions &&
+	if (m_filterOptimizationNoise &&
 		(
 			op == UnaryOp::EXTCODEHASH ||
 			op == UnaryOp::EXTCODESIZE ||
@@ -698,28 +689,14 @@ void ProtoConverter::visit(TernaryOp const& _x)
 void ProtoConverter::visit(NullaryOp const& _x)
 {
 	auto op = _x.op();
-	// The following instructions may lead to a change in EVM state and are
-	// excluded to avoid false positive reports.
-	if (
-		m_filterStatefulInstructions &&
+	if ( m_filterOptimizationNoise &&
 		(
 			op == NullaryOp::GAS ||
 			op == NullaryOp::CODESIZE ||
 			op == NullaryOp::ADDRESS ||
 			op == NullaryOp::TIMESTAMP ||
 			op == NullaryOp::NUMBER ||
-			op == NullaryOp::DIFFICULTY
-		)
-	)
-	{
-		m_output << dictionaryToken();
-		return;
-	}
-	// The following instructions can e sued to easily distinguish optimized
-	// and unoptimized code, which will lead to a lot of false positives.
-	if (
-		m_filterOptimizationNoise &&
-		(
+			op == NullaryOp::DIFFICULTY ||
 			op == NullaryOp::GAS ||
 			op == NullaryOp::MSIZE
 		)
@@ -828,18 +805,7 @@ void ProtoConverter::visit(CopyFunc const& _x)
 	if (type == CopyFunc::DATA && !m_isObject)
 		return;
 
-	// We don't generate code if the copy function is returndatacopy
-	// and the underlying evm does not support it.
-	if (type == CopyFunc::RETURNDATA && !m_evmVersion.supportsReturndata())
-		return;
-
-	// Bail out if MCOPY is not supported for fuzzed EVM version
-	if (type == CopyFunc::MEMORY && !m_evmVersion.hasMcopy())
-		return;
-
-	// Code copy may change state if e.g., some byte of code
-	// is stored to storage via a sequence of mload and sstore.
-	if (m_filterStatefulInstructions && type == CopyFunc::CODE)
+	if (m_filterOptimizationNoise && type == CopyFunc::CODE)
 		return;
 
 	switch (type)
@@ -1495,17 +1461,14 @@ void ProtoConverter::visit(Statement const& _x)
 			m_output << "continue\n";
 		break;
 	case Statement::kLogFunc:
-		// Log is a stateful statement since it writes to storage.
-		if (!m_filterStatefulInstructions)
+		if (!m_filterOptimizationNoise)
 			visit(_x.log_func());
 		break;
 	case Statement::kCopyFunc:
 		visit(_x.copy_func());
 		break;
 	case Statement::kExtcodeCopy:
-		// Extcodecopy may change state if external code is copied via a
-		// sequence of mload/sstore.
-		if (!m_filterStatefulInstructions)
+		if (!m_filterOptimizationNoise)
 			visit(_x.extcode_copy());
 		break;
 	case Statement::kTerminatestmt:
