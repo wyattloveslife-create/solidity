@@ -578,7 +578,10 @@ void ProtoConverter::visit(UnaryOp const& _x)
 {
 	UnaryOp_UOp op = _x.op();
 
-	if (m_filterStatefulInstructions &&
+	// The following instructions may lead to change of EVM state and are hence
+	// excluded to avoid false positives.
+	if (
+		m_filterStatefulInstructions &&
 		(
 			op == UnaryOp::EXTCODEHASH ||
 			op == UnaryOp::EXTCODESIZE ||
@@ -662,8 +665,12 @@ void ProtoConverter::visit(TernaryOp const& _x)
 void ProtoConverter::visit(NullaryOp const& _x)
 {
 	auto op = _x.op();
-	if ( m_filterStatefulInstructions &&
-		 (
+	// The following instructions may lead to a change in EVM state and are
+	// excluded to avoid false positive reports.
+	if (
+		m_filterStatefulInstructions &&
+		(
+			op == NullaryOp::GAS ||
 			op == NullaryOp::CODESIZE ||
 			op == NullaryOp::ADDRESS ||
 			op == NullaryOp::TIMESTAMP ||
