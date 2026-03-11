@@ -54,7 +54,7 @@ void FuzzerUtil::testCompilerJsonInterface(std::string const& _input, bool _opti
 	config["settings"]["optimizer"] = Json::object();
 	config["settings"]["optimizer"]["enabled"] = _optimize;
 	config["settings"]["optimizer"]["runs"] = static_cast<int>(OptimiserSettings{}.expectedExecutionsPerDeployment);
-	config["settings"]["evmVersion"] = evmc_revision_to_string(solidity::langutil::EVMVersion::current());
+	config["settings"]["evmVersion"] = solidity::langutil::EVMVersion::current().name();
 
 	// Enable all SourceUnit-level outputs.
 	config["settings"]["outputSelection"]["*"][""][0] = "*";
@@ -76,7 +76,6 @@ void FuzzerUtil::forceSMT(StringMap& _input)
 void FuzzerUtil::testCompiler(
 	StringMap& _input,
 	bool _optimize,
-	unsigned _rand,
 	bool _forceSMT,
 	bool _compileViaYul
 )
@@ -107,7 +106,7 @@ void FuzzerUtil::testCompiler(
 		});
 	}
 	compiler.setSources(_input);
-	compiler.setEVMVersion(solidity::langutil::EVMVersion::current(););
+	compiler.setEVMVersion(solidity::langutil::EVMVersion::current());
 	compiler.setOptimiserSettings(optimiserSettings);
 	compiler.setViaIR(_compileViaYul);
 	// We need to set it to NoMetadata, or we would get UTF-8 issues, which are uninteresting

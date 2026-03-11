@@ -104,9 +104,9 @@ void copyZeroExtendedWithOverlap(
 	if (_targetOffset >= _sourceOffset)
 		for (size_t i = _size; i > 0; --i)
 			_target[_targetOffset + i - 1] = (_source.count(_sourceOffset + i - 1) != 0 ? _source.at(_sourceOffset + i - 1) : 0);
-		else
-			for (size_t i = 0; i < _size; ++i)
-				_target[_targetOffset + i] = (_source.count(_sourceOffset + i) != 0 ? _source.at(_sourceOffset + i) : 0);
+	else
+		for (size_t i = 0; i < _size; ++i)
+			_target[_targetOffset + i] = (_source.count(_sourceOffset + i) != 0 ? _source.at(_sourceOffset + i) : 0);
 }
 
 }
@@ -799,4 +799,3 @@ void EVMInstructionInterpreter::chargeCopyWordCost(u256 const& _size)
 	size_t const words = (cappedSize + 31) / 32;
 	chargeCost(words);
 }
-

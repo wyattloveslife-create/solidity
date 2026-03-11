@@ -38,7 +38,6 @@ using namespace solidity::langutil;
 using namespace solidity::util;
 using namespace solidity;
 
-
 std::string ProtoConverter::dictionaryToken(HexPrefix _p)
 {
 	std::string token;
@@ -763,6 +762,8 @@ void ProtoConverter::visit(CopyFunc const& _x)
 	if (type == CopyFunc::DATA && !m_isObject)
 		return;
 
+	// Code copy may change state if e.g., some byte of code
+	// is stored to storage via a sequence of mload and sstore.
 	if (m_filterStatefulInstructions && type == CopyFunc::CODE)
 		return;
 
@@ -1396,6 +1397,7 @@ void ProtoConverter::visit(Statement const& _x)
 			m_output << "continue\n";
 		break;
 	case Statement::kLogFunc:
+		// Log is a stateful statement since it writes to storage.
 		if (!m_filterStatefulInstructions)
 			visit(_x.log_func());
 		break;
@@ -1403,6 +1405,8 @@ void ProtoConverter::visit(Statement const& _x)
 		visit(_x.copy_func());
 		break;
 	case Statement::kExtcodeCopy:
+		// Extcodecopy may change state if external code is copied via a
+		// sequence of mload/sstore.
 		if (!m_filterStatefulInstructions)
 			visit(_x.extcode_copy());
 		break;

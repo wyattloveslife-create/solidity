@@ -31,9 +31,8 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size);
 
 extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 {
-	if (_size > 600)
-		return 0;
-
+	// We don't limit the `_size`, because it can be limited by the fuzzing engine's configuration
+	// via `-max_len=N`
 	YulStringRepository::reset();
 
 	std::string input(reinterpret_cast<char const*>(_data), _size);

@@ -48,9 +48,21 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size);
 
 extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 {
-	if (_size > 600)
-		return 0;
+	// We don't limit the `_size`, because it can be limited by the fuzzing engine's configuration
+	// via `-max_len=N`
+	size_t calld_size = 0;
+    bytes calldata = {};
+	if (_size > 0) {
+		size_t calld_size = static_cast<size_t>(_data[0]);
+		_data++;
+		_size--;
+		calld_size = std::min(calld_size, _size);
+		if (calld_size > 0)
+			calldata = bytes(_data, _data + calld_size);
 
+	}
+	_data += calld_size;
+	_size -= calld_size;
 	std::string input(reinterpret_cast<char const*>(_data), _size);
 
 	if (std::any_of(input.begin(), input.end(), [](char c) {
@@ -80,16 +92,6 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 	{
 		return 0;
 	}
-    const bytes calldata = {
-            0xe9, 0x96, 0x40, 0x7d, 0xa5, 0xda, 0xb0, 0x2d,
-            0x97, 0xf5, 0xc3, 0x44, 0xd7, 0x65, 0x0a, 0xd8,
-            0x2c, 0x14, 0x3a, 0xf3, 0xe7, 0x40, 0x0f, 0x1e,
-            0x67, 0xce, 0x90, 0x44, 0x2e, 0x92, 0xdb, 0x88,
-            0xb8, 0x43, 0x9c, 0x41, 0x42, 0x08, 0xf1, 0xd7,
-            0x65, 0xe9, 0x7f, 0xeb, 0x7b, 0xb9, 0x56, 0x9f,
-            0xc7, 0x60, 0x5f, 0x7c, 0xcd, 0xfb, 0x92, 0xcd,
-            0x8e, 0xf3, 0x9b, 0xe4, 0x4f, 0x6c, 0x14, 0xde
-    };
 
 	std::ostringstream os1;
 	std::ostringstream os2;

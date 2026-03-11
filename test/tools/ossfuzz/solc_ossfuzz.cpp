@@ -43,15 +43,16 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 	{
 		TestCaseReader t = TestCaseReader(std::istringstream(input));
 		sourceCode = t.sources().sources;
-		const bool compileViaYul = _size % 3 == 1;
-		const bool optimize = _size % 2 == 0;
+		std::map<std::string, std::string> settings = t.settings();
+		bool compileViaYul =
+				settings.count("compileViaYul") &&
+				(settings.at("compileViaYul") == "also" || settings.at("compileViaYul") == "true");
+		bool optimize = settings.count("optimize") && settings.at("optimize") == "true";
 		// Always use the latest EVM version. Bugs with older EVMs are not as relevant
-		const solidity::langutil::EVMVersion evmVersion = solidity::langutil::EVMVersion::current();
 		const bool forceSMT = false;
 		FuzzerUtil::testCompiler(
 			sourceCode,
 			optimize,
-			evmVersion,
 			forceSMT,
 			compileViaYul
 		);

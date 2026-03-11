@@ -40,7 +40,6 @@ struct FuzzerUtil
 	static void testCompiler(
 		solidity::StringMap& _input,
 		bool _optimize,
-		unsigned _rand,
 		bool _forceSMT,
 		bool _compileViaYul
 	);

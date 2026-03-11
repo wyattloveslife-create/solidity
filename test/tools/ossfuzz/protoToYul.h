@@ -40,7 +40,7 @@ class ProtoConverter
 {
 public:
 	ProtoConverter(
-		bool _filterStatefulInstructions = false
+		bool _filterStatefulInstructions = false,
 		bool _filterOptimizationNoise = false
 	)
 	{

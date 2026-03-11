@@ -48,7 +48,7 @@ DEFINE_PROTO_FUZZER(Program const& _input)
 {
 	ProtoConverter converter(/*filterStatefulInstructions*/false, /*filterOptimizationNoise*/true);
 	std::string yul_source = converter.programToString(_input);
-	EVMVersion version = converter.version();
+	auto version = solidity::langutil::EVMVersion::current();
 	auto calldata = converter.calldata();
 
 	if (const char* dump_path = getenv("PROTO_FUZZER_DUMP_PATH"))
