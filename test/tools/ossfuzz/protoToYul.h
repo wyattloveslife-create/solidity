@@ -40,6 +40,7 @@ class ProtoConverter
 {
 public:
 	ProtoConverter(
+		bool _filterStatefulInstructions = false
 		bool _filterOptimizationNoise = false
 	)
 	{
@@ -56,17 +57,13 @@ public:
 		m_objectId = 0;
 		m_isObject = false;
 		m_forInitScopeExtEnabled = true;
+		m_filterStatefulInstructions = _filterStatefulInstructions;
 		m_filterOptimizationNoise = _filterOptimizationNoise;
 	}
 	ProtoConverter(ProtoConverter const&) = delete;
 	ProtoConverter(ProtoConverter&&) = delete;
 	std::string programToString(Program const& _input);
 
-	/// Returns evm version
-	solidity::langutil::EVMVersion version()
-	{
-		return m_evmVersion;
-	}
 	const bytes& calldata() const
 	{
 		return m_calldata;
@@ -387,8 +384,9 @@ private:
 	/// Flag to track whether scope extension of variables defined in for-init
 	/// block is enabled.
 	bool m_forInitScopeExtEnabled;
-	/// Object that holds the targeted evm version specified by protobuf input
-	solidity::langutil::EVMVersion m_evmVersion;
+	/// Flag that, if set, stops the converter from generating state changing
+	/// opcodes.
+	bool m_filterStatefulInstructions;
 	/// Flag that, if set, stops the converter from generating Yul code that
 	/// will generate values that can be used to easily distinguish generated
 	/// test cases from each other by the Yul optimizer.

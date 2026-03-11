@@ -75,7 +75,7 @@ void FuzzerUtil::forceSMT(StringMap& _input)
 void FuzzerUtil::testCompiler(
 	StringMap& _input,
 	bool _optimize,
-	EVMVersion const& _evmVersion,
+	unsigned _rand,
 	bool _forceSMT,
 	bool _compileViaYul
 )
@@ -106,7 +106,7 @@ void FuzzerUtil::testCompiler(
 		});
 	}
 	compiler.setSources(_input);
-	compiler.setEVMVersion(_evmVersion);
+	compiler.setEVMVersion(solidity::langutil::EVMVersion::current(););
 	compiler.setOptimiserSettings(optimiserSettings);
 	compiler.setViaIR(_compileViaYul);
 	// We need to set it to NoMetadata, or we would get UTF-8 issues, which are uninteresting

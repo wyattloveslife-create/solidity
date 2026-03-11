@@ -258,7 +258,7 @@ void ProtoConverter::visit(Expression const& _x)
 			m_output << dictionaryToken();
 		break;
 	case Expression::kUnopdata:
-		if (m_isObject && !m_filterOptimizationNoise)
+		if (m_isObject && !m_filterStatefulInstructions)
 			visit(_x.unopdata());
 		else
 			m_output << dictionaryToken();
@@ -272,13 +272,6 @@ void ProtoConverter::visit(Expression const& _x)
 void ProtoConverter::visit(BinaryOp const& _x)
 {
 	BinaryOp_BOp op = _x.op();
-
-	if ((op == BinaryOp::SHL || op == BinaryOp::SHR || op == BinaryOp::SAR) &&
-		!m_evmVersion.hasBitwiseShifting())
-	{
-		m_output << dictionaryToken();
-		return;
-	}
 
 	switch (op)
 	{
@@ -316,15 +309,12 @@ void ProtoConverter::visit(BinaryOp const& _x)
 		m_output << "gt";
 		break;
 	case BinaryOp::SHR:
-		yulAssert(m_evmVersion.hasBitwiseShifting(), "Proto fuzzer: Invalid evm version");
 		m_output << "shr";
 		break;
 	case BinaryOp::SHL:
-		yulAssert(m_evmVersion.hasBitwiseShifting(), "Proto fuzzer: Invalid evm version");
 		m_output << "shl";
 		break;
 	case BinaryOp::SAR:
-		yulAssert(m_evmVersion.hasBitwiseShifting(), "Proto fuzzer: Invalid evm version");
 		m_output << "sar";
 		break;
 	case BinaryOp::SDIV:
@@ -583,27 +573,7 @@ void ProtoConverter::visit(UnaryOp const& _x)
 {
 	UnaryOp_UOp op = _x.op();
 
-	// Replace calls to extcodehash on unsupported EVMs with a dictionary
-	// token.
-	if (op == UnaryOp::EXTCODEHASH && !m_evmVersion.hasExtCodeHash())
-	{
-		m_output << dictionaryToken();
-		return;
-	}
-
-	if (op == UnaryOp::TLOAD && !m_evmVersion.supportsTransientStorage())
-	{
-		m_output << dictionaryToken();
-		return;
-	}
-
-	if (op == UnaryOp::BLOBHASH && !m_evmVersion.hasBlobHash())
-	{
-		m_output << dictionaryToken();
-		return;
-	}
-
-	if (m_filterOptimizationNoise &&
+	if (m_filterStatefulInstructions &&
 		(
 			op == UnaryOp::EXTCODEHASH ||
 			op == UnaryOp::EXTCODESIZE ||
@@ -687,17 +657,21 @@ void ProtoConverter::visit(TernaryOp const& _x)
 void ProtoConverter::visit(NullaryOp const& _x)
 {
 	auto op = _x.op();
-	if ( m_filterOptimizationNoise &&
-		(
-			op == NullaryOp::GAS ||
+	if ( m_filterStatefulInstructions &&
+		 (
 			op == NullaryOp::CODESIZE ||
 			op == NullaryOp::ADDRESS ||
 			op == NullaryOp::TIMESTAMP ||
 			op == NullaryOp::NUMBER ||
 			op == NullaryOp::DIFFICULTY ||
-			op == NullaryOp::GAS ||
-			op == NullaryOp::MSIZE
 		)
+	)
+	{
+		m_output << dictionaryToken();
+		return;
+	}
+	if ( m_filterOptimizationNoise &&
+		( op == NullaryOp::GAS || op == NullaryOp::MSIZE )
 	)
 	{
 		m_output << dictionaryToken();
@@ -719,12 +693,7 @@ void ProtoConverter::visit(NullaryOp const& _x)
 		m_output << "codesize()";
 		break;
 	case NullaryOp::RETURNDATASIZE:
-		// If evm supports returndatasize, we generate it. Otherwise,
-		// we output a dictionary token.
-		if (m_evmVersion.supportsReturndata())
-			m_output << "returndatasize()";
-		else
-			m_output << dictionaryToken();
+		m_output << "returndatasize()";
 		break;
 	case NullaryOp::ADDRESS:
 		m_output << "address()";
@@ -751,10 +720,7 @@ void ProtoConverter::visit(NullaryOp const& _x)
 		m_output << "number()";
 		break;
 	case NullaryOp::DIFFICULTY:
-		if (m_evmVersion >= EVMVersion::paris())
-			m_output << "prevrandao()";
-		else
-			m_output << "difficulty()";
+		m_output << "prevrandao()";
 		break;
 	case NullaryOp::GASLIMIT:
 		m_output << "gaslimit()";
@@ -762,34 +728,22 @@ void ProtoConverter::visit(NullaryOp const& _x)
 	case NullaryOp::SELFBALANCE:
 		// Replace calls to selfbalance() on unsupported EVMs with a dictionary
 		// token.
-		if (m_evmVersion.hasSelfBalance())
-			m_output << "selfbalance()";
-		else
-			m_output << dictionaryToken();
+		m_output << "selfbalance()";
 		break;
 	case NullaryOp::CHAINID:
 		// Replace calls to chainid() on unsupported EVMs with a dictionary
 		// token.
-		if (m_evmVersion.hasChainID())
-			m_output << "chainid()";
-		else
-			m_output << dictionaryToken();
+		m_output << "chainid()";
 		break;
 	case NullaryOp::BASEFEE:
 		// Replace calls to basefee() on unsupported EVMs with a dictionary
 		// token.
-		if (m_evmVersion.hasBaseFee())
-			m_output << "basefee()";
-		else
-			m_output << dictionaryToken();
+		m_output << "basefee()";
 		break;
 	case NullaryOp::BLOBBASEFEE:
 		// Replace calls to blobbasefee() on unsupported EVMs with a dictionary
 		// token.
-		if (m_evmVersion.hasBlobBaseFee())
-			m_output << "blobbasefee()";
-		else
-			m_output << dictionaryToken();
+		m_output << "blobbasefee()";
 		break;
 	}
 }
@@ -803,7 +757,7 @@ void ProtoConverter::visit(CopyFunc const& _x)
 	if (type == CopyFunc::DATA && !m_isObject)
 		return;
 
-	if (m_filterOptimizationNoise && type == CopyFunc::CODE)
+	if (m_filterStatefulInstructions && type == CopyFunc::CODE)
 		return;
 
 	switch (type)
@@ -815,7 +769,6 @@ void ProtoConverter::visit(CopyFunc const& _x)
 		m_output << "codecopy";
 		break;
 	case CopyFunc::RETURNDATA:
-		yulAssert(m_evmVersion.supportsReturndata(), "Proto fuzzer: Invalid evm version");
 		m_output << "returndatacopy";
 		break;
 	case CopyFunc::DATA:
@@ -1043,15 +996,6 @@ void ProtoConverter::visit(LowLevelCall const& _x)
 {
 	LowLevelCall_Type type = _x.callty();
 
-	// Generate staticcall if it is supported by the underlying evm
-	if (type == LowLevelCall::STATICCALL && !m_evmVersion.hasStaticCall())
-	{
-		// Since staticcall is supposed to return 0 on success and 1 on
-		// failure, we can use counter value to emulate it
-		m_output << ((counter() % 2) ? "0" : "1");
-		return;
-	}
-
 	switch (type)
 	{
 	case LowLevelCall::CALL:
@@ -1064,7 +1008,6 @@ void ProtoConverter::visit(LowLevelCall const& _x)
 		m_output << "delegatecall(";
 		break;
 	case LowLevelCall::STATICCALL:
-		yulAssert(m_evmVersion.hasStaticCall(), "Proto fuzzer: Invalid evm version");
 		m_output << "staticcall(";
 		break;
 	}
@@ -1098,14 +1041,6 @@ void ProtoConverter::visit(LowLevelCall const& _x)
 void ProtoConverter::visit(Create const& _x)
 {
 	Create_Type type = _x.createty();
-
-	// Replace a call to create2 on unsupported EVMs with a dictionary
-	// token.
-	if (type == Create::CREATE2 && !m_evmVersion.hasCreate2())
-	{
-		m_output << dictionaryToken();
-		return;
-	}
 
 	switch (type)
 	{
@@ -1144,10 +1079,6 @@ void ProtoConverter::visit(IfStmt const& _x)
 void ProtoConverter::visit(StoreFunc const& _x)
 {
 	auto storeType = _x.st();
-	// Skip statement generation if tstore is not
-	// supported in EVM version
-	if (storeType == StoreFunc::TSTORE && !m_evmVersion.supportsTransientStorage())
-		return;
 
 	switch (storeType)
 	{
@@ -1459,14 +1390,14 @@ void ProtoConverter::visit(Statement const& _x)
 			m_output << "continue\n";
 		break;
 	case Statement::kLogFunc:
-		if (!m_filterOptimizationNoise)
+		if (!m_filterStatefulInstructions)
 			visit(_x.log_func());
 		break;
 	case Statement::kCopyFunc:
 		visit(_x.copy_func());
 		break;
 	case Statement::kExtcodeCopy:
-		if (!m_filterOptimizationNoise)
+		if (!m_filterStatefulInstructions)
 			visit(_x.extcode_copy());
 		break;
 	case Statement::kTerminatestmt:
@@ -1781,7 +1712,7 @@ void ProtoConverter::saveFunctionCallOutput(std::vector<std::string> const& _var
 	{
 		// Flip a dice to choose whether to save output values
 		// in storage or memory.
-		unsigned diceThrow = counter() % (m_evmVersion.supportsTransientStorage() ? 3 : 2);
+		unsigned diceThrow = counter() % 3;
 		// Pseudo-randomly choose one of the first ten 32-byte
 		// aligned slots.
 		std::string slot = std::to_string((counter() % numSlots) * slotSize);
@@ -1790,13 +1721,7 @@ void ProtoConverter::saveFunctionCallOutput(std::vector<std::string> const& _var
 		else if (diceThrow == 1)
 			m_output << "mstore(" << slot << ", " << var << ")\n";
 		else
-		{
-			yulAssert(
-				m_evmVersion.supportsTransientStorage(),
-				"Proto fuzzer: Invalid evm version"
-			);
 			m_output << "tstore(" << slot << ", " << var << ")\n";
-		}
 	}
 }
 
@@ -1995,11 +1920,6 @@ void ProtoConverter::visit(Program const& _x)
 {
 	// Initialize input size
 	m_inputSize = static_cast<unsigned>(_x.ByteSizeLong());
-
-	// For legacy reasons, we keep the Proto definition as-is,
-	// but we fix the EVM version to latest, so we don't get
-	// old EVM version bugs.
-	m_evmVersion = solidity::langutil::EVMVersion::current();
 
 	// Create Calldata
 	m_calldata = createCalldata(_x.calldata());
