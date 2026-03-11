@@ -20,7 +20,6 @@
 
 #include <map>
 #include <string>
-#include <liblangutil/EVMVersion.h>
 
 /**
  * Functions to be used for fuzz-testing of various components.

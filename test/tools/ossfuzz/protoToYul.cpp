@@ -252,12 +252,18 @@ void ProtoConverter::visit(Expression const& _x)
 		visit(_x.lowcall());
 		break;
 	case Expression::kCreate:
-		if (!m_filterOptimizationNoise)
+		// Create and create2 return address of created contract which
+		// may lead to state change via sstore of the returned address.
+		if (!m_filterStatefulInstructions)
 			visit(_x.create());
 		else
 			m_output << dictionaryToken();
 		break;
 	case Expression::kUnopdata:
+		// Filter datasize and dataoffset because these instructions may return
+		// a value that is a function of optimisation. Therefore, when run on
+		// an EVM client, the execution traces for unoptimised vs optimised
+		// programs may differ. This ends up as a false-positive bug report.
 		if (m_isObject && !m_filterStatefulInstructions)
 			visit(_x.unopdata());
 		else
@@ -663,7 +669,7 @@ void ProtoConverter::visit(NullaryOp const& _x)
 			op == NullaryOp::ADDRESS ||
 			op == NullaryOp::TIMESTAMP ||
 			op == NullaryOp::NUMBER ||
-			op == NullaryOp::DIFFICULTY ||
+			op == NullaryOp::DIFFICULTY
 		)
 	)
 	{

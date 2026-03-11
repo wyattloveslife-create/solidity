@@ -22,6 +22,7 @@
 #include <libsolidity/interface/CompilerStack.h>
 #include <libsolidity/formal/ModelCheckerSettings.h>
 
+#include <liblangutil/EVMVersion.h>
 #include <libsolutil/JSON.h>
 
 #include <libevmasm/Assembly.h>
@@ -53,7 +54,7 @@ void FuzzerUtil::testCompilerJsonInterface(std::string const& _input, bool _opti
 	config["settings"]["optimizer"] = Json::object();
 	config["settings"]["optimizer"]["enabled"] = _optimize;
 	config["settings"]["optimizer"]["runs"] = static_cast<int>(OptimiserSettings{}.expectedExecutionsPerDeployment);
-	config["settings"]["evmVersion"] = "berlin";
+	config["settings"]["evmVersion"] = evmc_revision_to_string(solidity::langutil::EVMVersion::current());
 
 	// Enable all SourceUnit-level outputs.
 	config["settings"]["outputSelection"]["*"][""][0] = "*";

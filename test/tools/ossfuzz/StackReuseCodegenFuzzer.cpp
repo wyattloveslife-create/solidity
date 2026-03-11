@@ -72,7 +72,7 @@ DEFINE_PROTO_FUZZER(Program const& _input)
 	// ignore them in this fuzzer.
 	if (_input.has_obj())
 		return;
-	ProtoConverter converter(/*filterOptimizationNoise*/true);
+	ProtoConverter converter(/*filterStatefulInstructions*/false, /*filterOptimizationNoise*/true);
 	std::string yul_source = converter.programToString(_input);
 	// Do not fuzz the EVM Version field.
 	// See https://github.com/argotorg/solidity/issues/12590
