@@ -78,27 +78,26 @@ To be consistent and aid better evaluation of the utility of the fuzzing diction
 
 ## Executables generated
 
-- `yulProto_diff_ossfuzz.cpp`: exe is `yul_diff_ssa_cfg_ossfuzz`. Generates
+- `yul_diff_ssa_cfg_ossfuzz`: file is `yulProto_diff_ossfuzz.cpp`. Generates
   random YUL via Protobuf, compiles with and without optimisation, compares via YUL
   interpreter
-- `yulProtoFuzzer.cpp`: exe is`yul_proto_ossfuzz`. Generates random YUL via Protobuf,
+- `yul_proto_ossfuzz`: file is `yulProtoFuzzer.cpp`. Generates random YUL via Protobuf,
   runs different optimizer steps, and hopes it crashes
-- `strictasm_diff_ossfuzz.cpp`: exe is `strictasm_diff_ossfuzz`. Interprets random characters
+- `strictasm_diff_ossfuzz`: file is `strictasm_diff_ossfuzz.cpp`. Interprets random characters
   as strict assembly code, compiles with and without optimisation, compares via
   YUL interpreter
-- `strictasm_opt_ossfuzz.cpp`: exe is `strictasm_opt_ossfuzz`. Interprets
+- `strictasm_opt_ossfuzz`: file is `strictasm_opt_ossfuzz.cpp`. Interprets
   random characters as strict assembly code, runs the optimizer, and hopes it
   crashes
-- `strictasm_assembly_ossfuzz.cpp`: exe is `strictasm_assembly_ossfuzz`.
+- `strictasm_assembly_ossfuzz`: file is `strictasm_assembly_ossfuzz.cpp`.
   Interprets random characters as strict assembly code, assembles it, and hopes
   it crashes
-- `const_opt_ossfuzz.cpp`: exe is `const_opt_ossfuzz`. Interprets random characters as some kind
+- `const_opt_ossfuzz`: file is `const_opt_ossfuzz.cpp`. Interprets random characters as some kind
   of constants, runs the constant optimizer, and hopes it crashes
-- `solProtoFuzzer.cpp` exe is `sol_proto_ossfuzz`. Generates random Solidity via Protobuf.
+- `sol_proto_ossfuzz`: file is `solProtoFuzzer.cpp`. Generates random Solidity via Protobuf.
   This is actually generating pre-determined code that returns known constants.
   Runs via evmone (in-memory), asserts that it does not revert, test() function must return 0,
   i.e. all constants must be returned correctly.
-- `solc_ossfuzz.cpp`. exe is`solc_ossfuzz`. Interprets random characters as Solidity test case,
+- `solc_ossfuzz`: file is `solc_ossfuzz.cpp`. Interprets random characters as Solidity test case,
   compiles and hopes it crashes. NOTE: does not work well it seems
-- `solc_ossfuzz.cpp`: exe is `solc_mutator_ossfuzz`. Same as above, but with mutator included.
-  I sincerely think this mutator thing is junk.
+- `solc_mutator_ossfuzz`: file is `solc_ossfuzz.cpp`. Same as above, but with mutator included.
