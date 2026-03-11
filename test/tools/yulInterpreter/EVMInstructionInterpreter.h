@@ -48,9 +48,8 @@ namespace solidity::yul::test
 /// Copy @a _size bytes of @a _source at offset @a _sourceOffset to
 /// @a _target at offset @a _targetOffset. Behaves as if @a _source would
 /// continue with an infinite sequence of zero bytes beyond its end.
-template<typename T>
 void copyZeroExtended(
-	T& _target,
+	std::map<u256, uint8_t>& _target,
 	bytes const& _source,
 	size_t _targetOffset,
 	size_t _sourceOffset,
@@ -62,10 +61,9 @@ void copyZeroExtended(
 /// continue with an infinite sequence of zero bytes beyond its end.
 /// When target and source areas overlap, behaves as if the data was copied
 /// using an intermediate buffer.
-template<typename T, typename T2>
 void copyZeroExtendedWithOverlap(
-	T& _target,
-	T2 const& _source,
+	std::map<u256, uint8_t>& _target,
+	std::map<u256, uint8_t> const& _source,
 	size_t _targetOffset,
 	size_t _sourceOffset,
 	size_t _size
