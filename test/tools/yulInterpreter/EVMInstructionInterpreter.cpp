@@ -168,8 +168,6 @@ u256 EVMInstructionInterpreter::eval(
 		{
 			size_t const bits = static_cast<size_t>(msb(arg[1])) + 1;
 			chargeCost(1 + bits);
-			if (m_state.maxCost > 0 && m_state.cost >= m_state.maxCost)
-				BOOST_THROW_EXCEPTION(InstructionLimitReached());
 		}
 		return exp256(arg[0], arg[1]);
 	}

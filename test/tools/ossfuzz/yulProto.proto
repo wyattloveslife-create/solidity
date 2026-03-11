@@ -396,9 +396,9 @@ message Data {
   required string hex = 1;
 }
 
-// Note: this will be ignored, and only latest will be used
-// It is kept around so as to keep old corpus compatible
 message Program {
+  // Note: this will be ignored, and only latest will be used
+  // It is kept around so as to keep old corpus compatible
   enum Version {
     HOMESTEAD = 0;
     TANGERINE = 1;

@@ -39,8 +39,6 @@ using namespace solidity::util;
 using namespace solidity;
 
 
-static auto constexpr s_evmVersions = solidity::langutil::EVMVersion::allVersions();
-
 std::string ProtoConverter::dictionaryToken(HexPrefix _p)
 {
 	std::string token;
@@ -2001,7 +1999,7 @@ void ProtoConverter::visit(Program const& _x)
 	// For legacy reasons, we keep the Proto definition as-is,
 	// but we fix the EVM version to latest, so we don't get
 	// old EVM version bugs.
-	m_evmVersion = s_evmVersions.back();
+	m_evmVersion = solidity::langutil::EVMVersion::current();
 
 	// Create Calldata
 	m_calldata = createCalldata(_x.calldata());

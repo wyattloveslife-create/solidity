@@ -25,8 +25,6 @@
 
 using namespace solidity::frontend::test;
 
-static auto constexpr s_evmVersions = solidity::langutil::EVMVersion::allVersions();
-
 // Prototype as we can't use the FuzzerInterface.h header.
 extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size);
 
@@ -48,7 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 		const bool compileViaYul = _size % 3 == 1;
 		const bool optimize = _size % 2 == 0;
 		// Always use the latest EVM version. Bugs with older EVMs are not as relevant
-		const solidity::langutil::EVMVersion evmVersion = s_evmVersions.back();
+		const solidity::langutil::EVMVersion evmVersion = solidity::langutil::EVMVersion::current();
 		const bool forceSMT = false;
 		FuzzerUtil::testCompiler(
 			sourceCode,

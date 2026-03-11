@@ -82,7 +82,6 @@ DEFINE_PROTO_FUZZER(Program const& _input)
 		yulAssert(false, "Proto fuzzer generated malformed program");
 	}
 
-	// Generate pseudo-random calldata using libfuzzer input
 	std::ostringstream os1;
 	std::ostringstream os2;
 	// Disable memory tracing to avoid false positive reports
@@ -93,12 +92,7 @@ DEFINE_PROTO_FUZZER(Program const& _input)
 		os1,
 		calldata,
 		*stack.parserResult()->code(),
-		/*disableMemoryTracing=*/true,
-		/*outputStorageOnly=*/false,
-		yulFuzzerUtil::maxSteps,
-		yulFuzzerUtil::maxTraceSize,
-		yulFuzzerUtil::maxExprNesting,
-		yulFuzzerUtil::maxCost
+		/*disableMemoryTracing=*/true
 	);
 
 	if (yulFuzzerUtil::resourceLimitsExceeded(termReason))
