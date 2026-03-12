@@ -469,8 +469,7 @@ Token Scanner::scanMultiLineDocComment()
 	literal.complete();
 	if (!endFound)
 		return setError(ScannerError::IllegalCommentTerminator);
-	size_t invalidPos;
-	if (!util::validateUTF8(m_skippedComments[NextNext].literal, invalidPos))
+	if (!util::validateUTF8(m_skippedComments[NextNext].literal))
 		return setError(ScannerError::InvalidUTF8InComment);
 	return Token::CommentLiteral;
 }
