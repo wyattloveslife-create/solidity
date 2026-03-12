@@ -389,7 +389,7 @@ size_t Scanner::scanSingleLineDocComment()
 	}
 	literal.complete();
 	if (!util::validateUTF8(m_skippedComments[NextNext].literal))
-		m_skippedComments[NextNext].error = ScannerError::InvalidUTF8InComment;
+		setError(ScannerError::InvalidUTF8InComment);
 	return endPosition;
 }
 
