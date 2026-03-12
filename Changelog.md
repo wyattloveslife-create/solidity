@@ -10,6 +10,7 @@ Compiler Features:
 * Yul EVM Code Transform: Improve stack shuffler performance by fixing a BFS deduplication issue.
 
 Bugfixes:
+* Parser: Fix a crash caused by invalid UTF-8 sequences in NatSpec comments. Such sequences now produce a proper error message instead.
 
 
 ### 0.8.34 (2026-02-18)
