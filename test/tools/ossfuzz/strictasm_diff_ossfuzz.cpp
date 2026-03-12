@@ -50,8 +50,7 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 {
 	// We don't limit the `_size`, because it can be limited by the fuzzing engine's configuration
 	// via `-max_len=N`
-	size_t calld_size = 0;
-    bytes calldata = {};
+	bytes calldata = {};
 	if (_size > 0) {
 		size_t calld_size = static_cast<size_t>(_data[0]);
 		_data++;
@@ -59,10 +58,9 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 		calld_size = std::min(calld_size, _size);
 		if (calld_size > 0)
 			calldata = bytes(_data, _data + calld_size);
-
+		_data += calld_size;
+		_size -= calld_size;
 	}
-	_data += calld_size;
-	_size -= calld_size;
 	std::string input(reinterpret_cast<char const*>(_data), _size);
 
 	if (std::any_of(input.begin(), input.end(), [](char c) {

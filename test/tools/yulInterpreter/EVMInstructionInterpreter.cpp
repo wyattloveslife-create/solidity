@@ -774,15 +774,16 @@ void EVMInstructionInterpreter::chargeCost(u256 const& _cost)
 	if (m_state.maxCost == 0 || _cost == 0)
 		return;
 
-	// More than size_t can handle
+	// size_t or more, just exit, way too much
 	if (_cost > u256(std::numeric_limits<size_t>::max()))
 		BOOST_THROW_EXCEPTION(InstructionLimitReached());
+	size_t const cost = static_cast<size_t>(_cost);
 
 	// wrap around check
-	if (m_state.cost + _cost <= m_state.cost)
+	if (m_state.cost > std::numeric_limits<size_t>::max() - cost)
 		BOOST_THROW_EXCEPTION(InstructionLimitReached());
 
-	m_state.cost += static_cast<size_t>(_cost);
+	m_state.cost += cost;
 	if (m_state.cost >= m_state.maxCost)
 		BOOST_THROW_EXCEPTION(InstructionLimitReached());
 }

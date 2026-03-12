@@ -33,10 +33,9 @@ struct FuzzerUtil
 	static void testStandardCompiler(std::string const& _input, bool _quiet);
 	/// Compiles @param _input which is a map of input file name to source code
 	/// string with optimisation turned on if @param _optimize is true
-	/// (off otherwise), a pseudo-random @param _rand that selects the EVM
-	/// version to be compiled for, and bool @param _forceSMT that, if true,
-	/// adds the experimental SMTChecker pragma to each source file in the
-	/// source map.
+	/// (off otherwise). Always targets the current EVM version.
+	/// @param _forceSMT if true, adds the experimental SMTChecker pragma to
+	/// each source file in the source map.
 	static void testCompiler(
 		solidity::StringMap& _input,
 		bool _optimize,

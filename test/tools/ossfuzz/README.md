@@ -79,13 +79,13 @@ To be consistent and aid better evaluation of the utility of the fuzzing diction
 ## Executables generated
 
 - `yul_diff_ssa_cfg_ossfuzz`: file is `yulProto_diff_ossfuzz.cpp`. Generates
-  random YUL via Protobuf, compiles with and without optimisation, compares via YUL
+  random Yul via Protobuf, compiles with and without optimisation, compares via Yul
   interpreter
-- `yul_proto_ossfuzz`: file is `yulProtoFuzzer.cpp`. Generates random YUL via Protobuf,
+- `yul_proto_ossfuzz`: file is `yulProtoFuzzer.cpp`. Generates random Yul via Protobuf,
   runs different optimizer steps, and hopes it crashes
 - `strictasm_diff_ossfuzz`: file is `strictasm_diff_ossfuzz.cpp`. Interprets random characters
   as strict assembly code, compiles with and without optimisation, compares via
-  YUL interpreter
+  Yul interpreter
 - `strictasm_opt_ossfuzz`: file is `strictasm_opt_ossfuzz.cpp`. Interprets
   random characters as strict assembly code, runs the optimizer, and hopes it
   crashes
@@ -99,5 +99,5 @@ To be consistent and aid better evaluation of the utility of the fuzzing diction
   Runs via evmone (in-memory), asserts that it does not revert, test() function must return 0,
   i.e. all constants must be returned correctly.
 - `solc_ossfuzz`: file is `solc_ossfuzz.cpp`. Interprets random characters as Solidity test case,
-  compiles and hopes it crashes. NOTE: does not work well it seems
+  compiles and hopes it crashes.
 - `solc_mutator_ossfuzz`: file is `solc_ossfuzz.cpp`. Same as above, but with mutator included.

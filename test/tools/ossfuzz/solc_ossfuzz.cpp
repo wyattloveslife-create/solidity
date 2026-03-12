@@ -48,7 +48,7 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* _data, size_t _size)
 				settings.count("compileViaYul") &&
 				(settings.at("compileViaYul") == "also" || settings.at("compileViaYul") == "true");
 		bool optimize = settings.count("optimize") && settings.at("optimize") == "true";
-		// Always use the latest EVM version. Bugs with older EVMs are not as relevant
+		// Disable SMT: it is expensive and times out frequently, reducing fuzzing throughput.
 		const bool forceSMT = false;
 		FuzzerUtil::testCompiler(
 			sourceCode,
