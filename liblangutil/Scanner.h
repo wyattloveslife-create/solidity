@@ -250,12 +250,6 @@ private:
 	/// is scanned.
 	bool scanEscape();
 
-	/// Reads a single UTF-8 encoded character starting at m_char, validates it, and adds
-	/// all its bytes to the comment literal. Advances m_char past the continuation bytes,
-	/// leaving m_char on the last byte of the sequence (the caller must still advance once).
-	/// @returns true on success, false if the byte sequence is not valid UTF-8.
-	bool addUTF8CommentChar();
-
 	/// @returns true iff we are currently positioned at a unicode line break.
 	bool isUnicodeLinebreak();
 

@@ -54,6 +54,8 @@
 #include <liblangutil/Exceptions.h>
 #include <liblangutil/Scanner.h>
 
+#include <libsolutil/UTF8.h>
+
 #include <boost/algorithm/string/classification.hpp>
 
 #include <optional>
@@ -346,33 +348,6 @@ bool Scanner::tryScanEndOfLine()
 	return false;
 }
 
-bool Scanner::addUTF8CommentChar()
-{
-	unsigned char const lead = static_cast<unsigned char>(m_char);
-	int seqLen;
-	if (lead <= 0x7F)
-		seqLen = 1;
-	else if (lead >= 0xC2 && lead <= 0xDF)
-		seqLen = 2;
-	else if (lead >= 0xE0 && lead <= 0xEF)
-		seqLen = 3;
-	else if (lead >= 0xF0 && lead <= 0xF4)
-		seqLen = 4;
-	else
-		return false;
-
-	addCommentLiteralChar(m_char);
-	for (int i = 1; i < seqLen; ++i)
-	{
-		if (!advance())
-			return false;
-		if ((static_cast<unsigned char>(m_char) & 0xC0) != 0x80)
-			return false;
-		addCommentLiteralChar(m_char);
-	}
-	return true;
-}
-
 size_t Scanner::scanSingleLineDocComment()
 {
 	LiteralScope literal(this, LITERAL_TYPE_COMMENT);
@@ -409,14 +384,13 @@ size_t Scanner::scanSingleLineDocComment()
 			// Any line terminator that is not '\n' is considered to end the
 			// comment.
 			break;
-		if (!addUTF8CommentChar())
-		{
-			m_skippedComments[NextNext].error = ScannerError::InvalidUTF8InComment;
-			return endPosition;
-		}
+		addCommentLiteralChar(m_char);
 		advance();
 	}
 	literal.complete();
+	size_t invalidPos;
+	if (!util::validateUTF8(m_skippedComments[NextNext].literal, invalidPos))
+		m_skippedComments[NextNext].error = ScannerError::InvalidUTF8InComment;
 	return endPosition;
 }
 
@@ -489,16 +463,17 @@ Token Scanner::scanMultiLineDocComment()
 			endFound = true;
 			break;
 		}
-		if (!addUTF8CommentChar())
-			return setError(ScannerError::InvalidUTF8InComment);
+		addCommentLiteralChar(m_char);
 		charsAdded = true;
 		advance();
 	}
 	literal.complete();
 	if (!endFound)
 		return setError(ScannerError::IllegalCommentTerminator);
-	else
-		return Token::CommentLiteral;
+	size_t invalidPos;
+	if (!util::validateUTF8(m_skippedComments[NextNext].literal, invalidPos))
+		return setError(ScannerError::InvalidUTF8InComment);
+	return Token::CommentLiteral;
 }
 
 Token Scanner::scanSlash()
