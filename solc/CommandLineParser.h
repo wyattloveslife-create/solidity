@@ -289,6 +289,9 @@ public:
 
 	CommandLineOptions const& options() const { return m_options; }
 
+	/// yields CLI option names (without leading "--") that require --experimental.
+	static std::vector<std::string> const& experimentalOptionNames();
+
 	static void printHelp(std::ostream& _out) { _out << optionsDescription(); }
 
 private:

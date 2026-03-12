@@ -159,6 +159,23 @@ void CommandLineParser::checkMutuallyExclusive(std::vector<std::string> const& _
 	}
 }
 
+std::vector<std::string> const& CommandLineParser::experimentalOptionNames()
+{
+	static std::vector<std::string> const names{
+		g_strLSP,
+		g_strImportAst,
+		g_strImportEvmAssemblerJson,
+		"ir-ast-json",
+		"ir-optimized-ast-json",
+		"yul-cfg-json",
+		"ethdebug",
+		"ethdebug-runtime",
+		g_strEOFVersion,
+		g_strViaSSACFG,
+	};
+	return names;
+}
+
 void CommandLineParser::checkExperimental(std::vector<std::string> const& _optionNames) const
 {
 	if (!m_args.contains(g_strExperimental) && countEnabledOptions(_optionNames) > 0)
@@ -994,18 +1011,7 @@ void CommandLineParser::processArgs()
 		g_strImportEvmAssemblerJson,
 	});
 
-	checkExperimental({
-		g_strLSP,
-		g_strImportAst,
-		g_strImportEvmAssemblerJson,
-		"ir-ast-json",
-		"ir-optimized-ast-json",
-		"yul-cfg-json",
-		"ethdebug",
-		"ethdebug-runtime",
-		g_strEOFVersion,
-		g_strViaSSACFG,
-	});
+	checkExperimental(experimentalOptionNames());
 
 	if (m_args.count(g_strHelp) > 0)
 		m_options.input.mode = InputMode::Help;
