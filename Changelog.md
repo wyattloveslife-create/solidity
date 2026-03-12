@@ -9,6 +9,7 @@ Compiler Features:
 * General: Restrict the existing experimental features (`generic-solidity`, `lsp`, `ethdebug`, `eof`, `evm`, `ast-import`, `evmasm-import`, `ir-ast`, `ssa-cfg`) to experimental mode.
 * Metadata: Store the state of the experimental mode in JSON and CBOR metadata. In CBOR this broadens the meaning of the existing `experimental` field, which used to indicate only the presence of certain experimental pragmas in the source.
 * Standard JSON Interface: Introduce `settings.experimental` setting required for enabling the experimental mode.
+* Yul: Drop the deprecated assembly input mode that was only accessible via `--assemble` in the CLI.
 * Yul EVM Code Transform: Improve stack shuffler performance by fixing a BFS deduplication issue.
 
 Bugfixes:

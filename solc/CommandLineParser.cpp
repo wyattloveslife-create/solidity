@@ -666,7 +666,10 @@ General Information)").c_str(),
 		)
 		(
 			g_strAssemble.c_str(),
-			"Switch to assembly mode and assume input is assembly."
+			fmt::format(
+				"(disabled) Switch to assembly mode and assume input is assembly. No longer supported. Use --{} instead.",
+				g_strStrictAssembly
+			).c_str()
 		)
 		(
 			g_strStrictAssembly.c_str(),
@@ -987,7 +990,6 @@ void CommandLineParser::processArgs()
 		g_strVersion,
 		g_strStandardJSON,
 		g_strLink,
-		g_strAssemble,
 		g_strStrictAssembly,
 		g_strImportAst,
 		g_strLSP,
@@ -1017,7 +1019,7 @@ void CommandLineParser::processArgs()
 		m_options.input.mode = InputMode::StandardJson;
 	else if (m_args.count(g_strLSP))
 		m_options.input.mode = InputMode::LanguageServer;
-	else if (m_args.count(g_strAssemble) > 0 || m_args.count(g_strStrictAssembly) > 0)
+	else if (m_args.contains(g_strStrictAssembly))
 		m_options.input.mode = InputMode::Assembler;
 	else if (m_args.count(g_strLink) > 0)
 		m_options.input.mode = InputMode::Linker;
@@ -1047,6 +1049,13 @@ void CommandLineParser::processArgs()
 		solThrow(
 			CommandLineValidationError,
 			"The typed Yul dialect formerly accessible via --yul is no longer supported, "
+			"please use --strict-assembly instead."
+		);
+
+	if (m_args.contains(g_strAssemble))
+		solThrow(
+			CommandLineValidationError,
+			"The Yul input mode formerly accessible via --assemble is no longer supported, "
 			"please use --strict-assembly instead."
 		);
 
