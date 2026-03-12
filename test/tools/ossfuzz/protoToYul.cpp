@@ -738,23 +738,15 @@ void ProtoConverter::visit(NullaryOp const& _x)
 		m_output << "gaslimit()";
 		break;
 	case NullaryOp::SELFBALANCE:
-		// Replace calls to selfbalance() on unsupported EVMs with a dictionary
-		// token.
 		m_output << "selfbalance()";
 		break;
 	case NullaryOp::CHAINID:
-		// Replace calls to chainid() on unsupported EVMs with a dictionary
-		// token.
 		m_output << "chainid()";
 		break;
 	case NullaryOp::BASEFEE:
-		// Replace calls to basefee() on unsupported EVMs with a dictionary
-		// token.
 		m_output << "basefee()";
 		break;
 	case NullaryOp::BLOBBASEFEE:
-		// Replace calls to blobbasefee() on unsupported EVMs with a dictionary
-		// token.
 		m_output << "blobbasefee()";
 		break;
 	}
