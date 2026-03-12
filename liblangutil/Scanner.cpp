@@ -84,6 +84,7 @@ std::string to_string(ScannerError _errorCode)
 		case ScannerError::OctalNotAllowed: return "Octal numbers not allowed.";
 		case ScannerError::DirectionalOverrideUnderflow: return "Unicode direction override underflow in comment or string literal.";
 		case ScannerError::DirectionalOverrideMismatch: return "Mismatching directional override markers in comment or string literal.";
+		case ScannerError::InvalidUTF8InComment: return "Invalid UTF-8 sequence in NatSpec comment.";
 		default:
 			solAssert(false, "Unhandled case in to_string(ScannerError)");
 			return "";
@@ -345,6 +346,33 @@ bool Scanner::tryScanEndOfLine()
 	return false;
 }
 
+bool Scanner::addUTF8CommentChar()
+{
+	unsigned char const lead = static_cast<unsigned char>(m_char);
+	int seqLen;
+	if (lead <= 0x7F)
+		seqLen = 1;
+	else if (lead >= 0xC2 && lead <= 0xDF)
+		seqLen = 2;
+	else if (lead >= 0xE0 && lead <= 0xEF)
+		seqLen = 3;
+	else if (lead >= 0xF0 && lead <= 0xF4)
+		seqLen = 4;
+	else
+		return false;
+
+	addCommentLiteralChar(m_char);
+	for (int i = 1; i < seqLen; ++i)
+	{
+		if (!advance())
+			return false;
+		if ((static_cast<unsigned char>(m_char) & 0xC0) != 0x80)
+			return false;
+		addCommentLiteralChar(m_char);
+	}
+	return true;
+}
+
 size_t Scanner::scanSingleLineDocComment()
 {
 	LiteralScope literal(this, LITERAL_TYPE_COMMENT);
@@ -381,7 +409,11 @@ size_t Scanner::scanSingleLineDocComment()
 			// Any line terminator that is not '\n' is considered to end the
 			// comment.
 			break;
-		addCommentLiteralChar(m_char);
+		if (!addUTF8CommentChar())
+		{
+			m_skippedComments[NextNext].error = ScannerError::InvalidUTF8InComment;
+			return endPosition;
+		}
 		advance();
 	}
 	literal.complete();
@@ -457,7 +489,8 @@ Token Scanner::scanMultiLineDocComment()
 			endFound = true;
 			break;
 		}
-		addCommentLiteralChar(m_char);
+		if (!addUTF8CommentChar())
+			return setError(ScannerError::InvalidUTF8InComment);
 		charsAdded = true;
 		advance();
 	}
@@ -488,6 +521,8 @@ Token Scanner::scanSlash()
 			m_skippedComments[NextNext].location.sourceName = m_sourceName;
 			m_skippedComments[NextNext].token = Token::CommentLiteral;
 			m_skippedComments[NextNext].location.end = static_cast<int>(scanSingleLineDocComment());
+			if (m_skippedComments[NextNext].error != ScannerError::NoError)
+				return setError(m_skippedComments[NextNext].error);
 			return Token::Whitespace;
 		}
 		else
