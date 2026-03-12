@@ -31,6 +31,8 @@
 #include <libsmtutil/SolverInterface.h>
 #include <libsolidity/interface/Version.h>
 
+#include <range/v3/algorithm/find.hpp>
+
 #include <map>
 #include <optional>
 #include <ostream>
@@ -429,20 +431,20 @@ BOOST_AUTO_TEST_CASE(invalid_options_input_modes_combinations)
 {
 	std::map<std::string, std::vector<std::string>> invalidOptionInputModeCombinations = {
 		// TODO: This should eventually contain all options.
-		{"--experimental-via-ir", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--via-ir", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--metadata-literal", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--metadata-hash=swarm", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-show-proved-safe", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-show-unproved", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-show-unsupported", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-div-mod-no-slacks", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-engine=bmc", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-invariants=contract,reentrancy", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-solvers=z3,smtlib2", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-timeout=5", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-contracts=contract1.yul:A,contract2.yul:B", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
-		{"--model-checker-targets=underflow,divByZero", {"--assemble", "--strict-assembly", "--standard-json", "--link"}},
+		{"--experimental-via-ir", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--via-ir", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--metadata-literal", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--metadata-hash=swarm", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-show-proved-safe", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-show-unproved", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-show-unsupported", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-div-mod-no-slacks", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-engine=bmc", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-invariants=contract,reentrancy", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-solvers=z3,smtlib2", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-timeout=5", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-contracts=contract1.yul:A,contract2.yul:B", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
+		{"--model-checker-targets=underflow,divByZero", {"--assemble", "--strict-assembly", "--standard-json", "--link", "--import-asm-json"}},
 		{"--via-ssa-cfg", {"--standard-json", "--link", "--import-asm-json"}}
 	};
 
@@ -455,12 +457,14 @@ BOOST_AUTO_TEST_CASE(invalid_options_input_modes_combinations)
 			soltestAssert(!optionNameWithoutValue.empty());
 
 			std::vector<std::string> commandLine = {"solc", optionName, "file", inputMode};
-			bool experimentalMode = false;
-			if (optionNameWithoutValue == "--via-ssa-cfg")
-			{
-				commandLine.push_back("--experimental");
-				experimentalMode = true;
-			}
+
+			static auto constexpr isExperimental = [](std::string_view const _cliFlag) -> bool {
+				auto const& experimentalOpts = CommandLineParser::experimentalOptionNames();
+				return ranges::find(experimentalOpts, _cliFlag.substr(2)) != ranges::end(experimentalOpts);
+			};
+			bool experimentalMode = isExperimental(optionNameWithoutValue) || isExperimental(inputMode);
+			if (experimentalMode)
+				commandLine.emplace_back("--experimental");
 
 			std::string expectedMessage = "The following options are not supported in the current input mode: " + optionNameWithoutValue;
 			// When --experimental is combined with --standard-json, a different error fires first
