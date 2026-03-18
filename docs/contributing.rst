@@ -63,6 +63,19 @@ In order to contribute, please fork off of the ``develop`` branch and make your
 changes there. Your commit messages should detail *why* you made your change
 in addition to *what* you did (unless it is a tiny change).
 
+After forking, clone your fork and add the upstream remote so you can keep your
+fork in sync with the main repository:
+
+.. code-block:: bash
+
+    git clone https://github.com/<YOUR-USERNAME>/solidity.git
+    cd solidity
+    git remote add upstream https://github.com/ethereum/solidity.git
+
+You can verify your remotes with ``git remote -v``. For more information on
+working with remote repositories, see `About remote repositories
+<https://docs.github.com/en/get-started/git-basics/about-remote-repositories>`_.
+
 If you need to pull in any changes from ``develop`` after making your fork (for
 example, to resolve potential merge conflicts), please avoid using ``git merge``
 and instead, ``git rebase`` your branch. This will help us review your change
