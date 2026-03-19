@@ -1,0 +1,64 @@
+name: Commit Signature Verification
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify-commit-signatures:
+    name: Verify commit signatures
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check commit signatures
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "## Commit Signature Verification" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Checking verification status of commits in this pull request..." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if ! commits=$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --jq '.[] | "\(.sha) \(.commit.verification.verified) \(.commit.verification.reason)"' 2>&1); then
+            echo "::error::Failed to retrieve commits from the GitHub API: $commits"
+            echo "⚠️ Could not retrieve commit data from the GitHub API." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          if [[ -z "$commits" ]]; then
+            echo "ℹ️ No commits found in this pull request." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          unsigned_commits=""
+          verified_count=0
+          total_count=0
+
+          while IFS=' ' read -r sha verified reason; do
+            total_count=$((total_count + 1))
+            short_sha="${sha:0:7}"
+            if [[ "$verified" == "true" ]]; then
+              verified_count=$((verified_count + 1))
+              echo "- ✅ \`$short_sha\` — Verified" >> $GITHUB_STEP_SUMMARY
+            else
+              unsigned_commits="$unsigned_commits $sha"
+              echo "- ❌ \`$short_sha\` — Unverified (reason: $reason)" >> $GITHUB_STEP_SUMMARY
+            fi
+          done <<< "$commits"
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Result:** $verified_count / $total_count commits verified." >> $GITHUB_STEP_SUMMARY
+
+          if [[ -n "$unsigned_commits" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "ℹ️ To sign your commits, see [Managing commit signature verification](https://docs.github.com/en/authentication/managing-commit-signature-verification)." >> $GITHUB_STEP_SUMMARY
+            echo "ℹ️ To display verification statuses for all of your commits, consider enabling [vigilant mode](https://docs.github.com/en/authentication/managing-commit-signature-verification/displaying-verification-statuses-for-all-of-your-commits)." >> $GITHUB_STEP_SUMMARY
+            echo "::warning::Some commits in this PR are not signed. See the job summary for details."
+          else
+            echo "All commits in this PR are signed and verified."
+          fi
