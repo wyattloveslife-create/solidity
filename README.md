@@ -78,6 +78,10 @@ if you want to help.
 You can find our current feature and bug priorities for forthcoming
 releases in the [projects section](https://github.com/argotorg/solidity/projects).
 
+This project uses GitHub features such as Issues, Pull Requests, and GitHub Actions.
+As a public repository, GitHub Actions usage is free for all contributors regardless of their
+[GitHub plan](https://docs.github.com/en/get-started/learning-about-github/githubs-plans).
+
 ## Maintainers
 The Solidity programming language and compiler are open-source community projects governed by a core team.
 The core team is sponsored by the [Ethereum Foundation](https://ethereum.foundation/).
