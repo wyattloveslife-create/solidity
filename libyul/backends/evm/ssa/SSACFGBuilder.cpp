@@ -479,7 +479,7 @@ void SSACFGBuilder::registerFunctionDefinition(FunctionDefinition const& _functi
 	yulAssert(m_scope->identifiers.count(_functionDefinition.name), "");
 	auto& function = std::get<Scope::Function>(m_scope->identifiers.at(_functionDefinition.name));
 	m_graph.functions.emplace_back(function);
-	m_functionDefinitions.emplace_back(&function, &_functionDefinition);
+	m_functionDefinitions.emplace(&function, &_functionDefinition);
 }
 
 void SSACFGBuilder::operator()(Block const& _block)
@@ -717,12 +717,8 @@ void SSACFGBuilder::jump(
 
 FunctionDefinition const* SSACFGBuilder::findFunctionDefinition(Scope::Function const* _function) const
 {
-	auto it = std::find_if(
-			m_functionDefinitions.begin(),
-			m_functionDefinitions.end(),
-			[&_function](auto const& _entry) { return std::get<0>(_entry) == _function; }
-		);
+	auto it = m_functionDefinitions.find(_function);
 	if (it != m_functionDefinitions.end())
-		return std::get<1>(*it);
+		return it->second;
 	return nullptr;
 }

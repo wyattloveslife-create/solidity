@@ -43,8 +43,8 @@ bool BlockDeduplicator::deduplicate()
 	// We abort if this virtual tag actually exists.
 	AssemblyItem pushSelf{PushTag, u256(-4)};
 	if (
-		std::count(m_items.cbegin(), m_items.cend(), pushSelf.tag()) ||
-		std::count(m_items.cbegin(), m_items.cend(), pushSelf.pushTag())
+		std::find(m_items.cbegin(), m_items.cend(), pushSelf.tag()) != m_items.cend() ||
+		std::find(m_items.cbegin(), m_items.cend(), pushSelf.pushTag()) != m_items.cend()
 	)
 		return false;
 
