@@ -194,6 +194,9 @@ The following points are all covered by the coding style but come up so often th
     - [ ] Each commit should be a self-contained, logical step leading the goal of the PR, without going back and forth.
         In particular, review fixups should be squashed into the commits they fix.
     - [ ] Do not include any merge commits in your branch. Please use rebase to keep up to date with the base branch.
+    - [ ] **Are commits signed and verified?**
+        Commits should be [signed with a GPG, SSH, or S/MIME key](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) and show a "Verified" badge on GitHub.
+        See [displaying verification statuses for all of your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/displaying-verification-statuses-for-all-of-your-commits) for details on enabling vigilant mode.
 - [ ] **Is the PR properly labeled?**
     - Use `external contribution` label to mark PRs not coming from the core team.
     - If the PR depends on other PRs, use `has dependencies` and set the base branch accordingly.
