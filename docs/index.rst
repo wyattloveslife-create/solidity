@@ -183,3 +183,4 @@ Contents
    contributing.rst
    language-influences.rst
    brand-guide.rst
+   git-basics.rst
