@@ -33,6 +33,7 @@
 #include <libyul/ControlFlowSideEffectsCollector.h>
 #include <libyul/backends/evm/ssa/SSACFG.h>
 #include <stack>
+#include <unordered_map>
 
 namespace solidity::yul::ssa
 {
@@ -95,7 +96,7 @@ private:
 	ControlFlowSideEffectsCollector const& m_sideEffects;
 	Dialect const& m_dialect;
 	bool const m_keepLiteralAssignments;
-	std::vector<std::tuple<Scope::Function const*, FunctionDefinition const*>> m_functionDefinitions;
+	std::unordered_map<Scope::Function const*, FunctionDefinition const*> m_functionDefinitions;
 	SSACFG::BlockId m_currentBlock;
 	SSACFG::BasicBlock& currentBlock() { return m_graph.block(m_currentBlock); }
 	Scope* m_scope = nullptr;

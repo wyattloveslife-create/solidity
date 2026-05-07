@@ -48,6 +48,7 @@
 #include <limits>
 #include <iterator>
 #include <stack>
+#include <unordered_set>
 
 using namespace solidity;
 using namespace solidity::evmasm;
@@ -626,14 +627,16 @@ std::pair<std::shared_ptr<Assembly>, std::vector<std::string>> Assembly::fromJSO
 	{
 		solAssert(_level == 0);
 		solAssert(_sourceList.empty());
+		std::unordered_set<std::string> seenSourceNames;
 		for (Json const& sourceName: _json["sourceList"])
 		{
+			auto const name = sourceName.get<std::string>();
 			solRequire(
-				std::find(parsedSourceList.begin(), parsedSourceList.end(), sourceName.get<std::string>()) == parsedSourceList.end(),
+				seenSourceNames.insert(name).second,
 				AssemblyImportException,
 				"Items in 'sourceList' array are not unique."
 			);
-			parsedSourceList.emplace_back(sourceName.get<std::string>());
+			parsedSourceList.emplace_back(name);
 		}
 	}
 
